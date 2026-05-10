@@ -1,0 +1,57 @@
+.\" Man page for rsvp-tui
+.TH RSVP-TUI 1 "2025-03-06" "1.0" "User Commands"
+.SH NAME
+rsvp-tui \- Rapid Serial Visual Presentation terminal ebook reader
+.SH SYNOPSIS
+.B rsvp-tui
+[\fIfile\fR]
+.SH DESCRIPTION
+\fBrsvp-tui\fR displays a text file one word at a time in the centre of the terminal, using the RSVP technique to speed reading. It features a modal interface with Vim‑style key bindings and Optimal Recognition Point (ORP) colour highlighting.
+.SH OPTIONS
+\fIfile\fR
+.RS
+Path to a plain text file to read.
+.RE
+.SH MODES
+.TP
+\fBAuto mode\fR (default)
+Words advance automatically at the specified words‑per‑minute (WPM) rate.
+.TP
+\fBManual mode\fR
+Words advance only when you press \fBj\fR or \fBl\fR.
+.SH KEY BINDINGS
+.SS Global
+.TP
+\fBq\fR
+Quit the program.
+.TP
+\fB?\fR
+Show help panel.
+.TP
+\fBm\fR
+Toggle between Auto and Manual mode.
+.SS Auto mode
+.TP
+\fB+\fR or \fBk\fR
+Increase WPM by 10.
+.TP
+\fB-\fR or \fBj\fR
+Decrease WPM by 10.
+.TP
+\fBSpace\fR or \fBp\fR
+Pause / resume.
+.SS Manual mode
+.TP
+\fBj\fR or \fBl\fR
+Next word.
+.TP
+\fBh\fR or \fBk\fR
+Previous word.
+.SH FEATURES
+- Centred word display with ORP letter highlighted in yellow (if terminal supports colour).
+- Real‑time progress bar and WPM display.
+- Non‑blocking input for responsive controls.
+.SH BUGS
+Report issues at https://github.com/yourname/rsvp-tui
+.SH AUTHOR
+Written by yourname <email@example.com>
