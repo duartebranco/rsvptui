@@ -4,10 +4,10 @@ import sys
 import os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-from model.book import Book
-from model.reader_state import ReaderState
-from view.terminal_display import TerminalDisplay
-from controller.rsvp_engine import RSVPEngine
+from src.model.book import Book
+from src.model.reader_state import ReaderState
+from src.view.terminal_display import TerminalDisplay
+from src.controller.rsvp_engine import RSVPEngine
 
 def main(stdscr):
     # parse command line argument
