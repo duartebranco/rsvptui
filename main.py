@@ -1,10 +1,13 @@
 import argparse
 import curses
 import sys
-from model import Book, ReaderState
-from view import TerminalDisplay
-from controller import RSVPEngine
+import os
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+from model.book import Book
+from model.reader_state import ReaderState
+from view.terminal_display import TerminalDisplay
+from controller.rsvp_engine import RSVPEngine
 
 def main(stdscr):
     # parse command line argument
