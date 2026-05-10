@@ -3,6 +3,7 @@ import curses
 import time
 from model.reader_state import ReaderState
 from view.terminal_display import TerminalDisplay
+from view.help_view import HelpView
 
 class RSVPEngine:
     # orchestrates the reading session
@@ -48,6 +49,9 @@ class RSVPEngine:
                 else:
                     # when paused, just sleep a short while to avoid CPU spinning
                     time.sleep(0.05)
+            else:  # MANUAL mode
+                # avoid flickering: only sleep a short time
+                time.sleep(0.02)
 
         # end of book
         self.display.show_completion()
@@ -64,7 +68,12 @@ class RSVPEngine:
         if key == ord('q'):
             self.running = False
         elif key == ord('?'):
-            self.display.show_help()
+            # temporarily disable nodelay to show help
+            self.stdscr.nodelay(False)
+            help_view = HelpView(self.stdscr)
+            help_view.show()
+            self.stdscr.nodelay(True)
+            # after help, re‑draw current word
             return
         elif key == ord('m'):
             self.state.toggle_mode()
@@ -78,12 +87,13 @@ class RSVPEngine:
                 self.state.wpm = min(self.state.wpm + self.WPM_STEP, self.MAX_WPM)
             elif key == ord('-') or key == ord('j'):
                 self.state.wpm = max(self.state.wpm - self.WPM_STEP, self.MIN_WPM)
-        else:
-            if key == ord('j') or key == ord('l'):
+        else:  # MANUAL mode
+            if key == ord('j'):
                 self.state.next_word()
-            elif key == ord('h') or key == ord('k'):
+            elif key == ord('k'):
                 self.state.previous_word()
-            elif key == ord('+'):
+            # allow +/- to still adjust WPM even in manual mode
+            if key == ord('+'):
                 self.state.wpm = min(self.state.wpm + self.WPM_STEP, self.MAX_WPM)
             elif key == ord('-'):
                 self.state.wpm = max(self.state.wpm - self.WPM_STEP, self.MIN_WPM)
@@ -92,7 +102,7 @@ class RSVPEngine:
         # sleep in short intervals so that pressing a key is detected quickly
         if seconds <= 0:
             return
-        granularity = 0.02  # 20 ms
+        granularity = 0.02
         slept = 0.0
         while slept < seconds and self.running and not self.state.paused:
             time.sleep(granularity)

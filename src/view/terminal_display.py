@@ -12,8 +12,11 @@ class TerminalDisplay:
         # set color pair for ORP highlighting
         if curses.has_colors():
             curses.start_color()
-            # use colour pair 1: yellow foreground on default background
-            curses.init_pair(1, curses.COLOR_YELLOW, -1)
+            try:
+                curses.use_default_colors()
+                curses.init_pair(1, curses.COLOR_YELLOW, -1)
+            except curses.error:
+                curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
     def resize(self):
         self.height, self.width = self.stdscr.getmaxyx()
@@ -68,36 +71,35 @@ class TerminalDisplay:
         # centered word
         word_x = max(0, (self.width - len(word)) // 2)
         word_y = self.height // 2
-        try:
-            self.stdscr.addstr(word_y, word_x, word)
-        except curses.error:
-            # if word too long to fit:
-            # truncate or just ignore (terminal will wrap)
-            pass
+        self._display_colored_word(word_y, word_x, word)
 
-        # progress bar (20 characters wide)
+        # progress bar
         bar_width = min(40, self.width - 4)
         filled = int(progress * bar_width)
         bar = "[" + "#" * filled + "-" * (bar_width - filled) + "]"
         percent = int(progress * 100)
         progress_text = f" {percent}% {bar}"
         try:
-            self.stdscr.addstr(self.height - 3, 0, progress_text[:self.width - 1])
+            self.stdscr.addstr(self.height - 4, 0, progress_text[:self.width - 1])
         except curses.error:
             pass
 
         # status line: WPM, pause indicator, help, mode
         mode_indicator = "MANUAL" if mode == "manual" else "AUTO"
-        status = f" [{mode_indicator}]  WPM: {wpm}   {'[PAUSED]' if paused else '[PLAYING]'}   |  ? : help"
+        if mode == "auto":
+            speed_hint = "j/k : speed"
+        else:
+            speed_hint = "j : next word   k : prev word"
+        status = f" [{mode_indicator}]  WPM: {wpm}  {'[PAUSED]' if paused else '[PLAYING]'}  |  {speed_hint}"
         if len(status) > self.width:
             status = status[:self.width - 1]
         try:
-            self.stdscr.addstr(self.height - 2, 0, status)
+            self.stdscr.addstr(self.height - 3, 0, status)
         except curses.error:
             pass
 
         # bottom hint line
-        hint = " +/k: faster  -/j: slower  Space/p: pause  m: toggle mode  q: quit"
+        hint = " Space/p: pause  m: toggle mode  ?: help  q: quit"
         if len(hint) > self.width:
             hint = hint[:self.width - 1]
         try:
@@ -118,48 +120,3 @@ class TerminalDisplay:
         except curses.error:
             pass
         self.refresh()
-
-    def show_help(self):
-        # help panel
-        help_lines = [
-            "=== RSVP TUI Help ===",
-            "",
-            "Modes:",
-            "  Auto mode     - words advance automatically at set WPM",
-            "  Manual mode   - press j/l to advance word by word",
-            "",
-            "Keys (Auto mode):",
-            "  + or k        - increase WPM",
-            "  - or j        - decrease WPM",
-            "",
-            "Keys (Manual mode):",
-            "  j or l        - next word",
-            "  h or k        - previous word",
-            "",
-            "Global keys:",
-            "  Space or p    - pause / resume (Auto mode only)",
-            "  m             - toggle Auto/Manual mode",
-            "  ?             - show this help",
-            "  q             - quit",
-            "",
-            "Press any key to return to reading"
-        ]
-        # save current screen content (not needed, we'll clear and restore)
-        self.clear()
-        # draw a box around help
-        h = len(help_lines) + 2
-        w = max(len(line) for line in help_lines) + 2
-        y0 = (self.height - h) // 2
-        x0 = (self.width - w) // 2
-        # simple border
-        try:
-            self.stdscr.attron(curses.A_REVERSE)
-            for i, line in enumerate(help_lines):
-                self.stdscr.addstr(y0 + 1 + i, x0 + 1, line.ljust(w-2)[:w-2])
-            self.stdscr.attroff(curses.A_REVERSE)
-        except curses.error:
-            pass
-        self.refresh()
-        # wait for a key
-        self.stdscr.getch()
-        # the caller will re‑draw the current word
