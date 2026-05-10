@@ -1,27 +1,10 @@
-# model.py
-# book (text loading) class
 # reader_state (current position, speed, pause)
-import os
-
-
-class Book:
-    # load a text file and tokenise into words (keeps punctuation attached)
-
-    def __init__(self, filepath: str):
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"{filepath} not found")
-        with open(filepath, "r", encoding="utf-8") as f:
-            raw_text = f.read()
-        self.words = self._tokenise(raw_text)
-
-    # split whitespace
-    @staticmethod
-    def _tokenise(text: str) -> list[str]:
-        return [word for word in text.split() if word]
-
 
 class ReaderState:
     # holds current position, speed, pause
+
+    MODE_AUTO = "auto"
+    MODE_MANUAL = "manual"
 
     def __init__(self, word_list: list[str], initial_wpm: int = 250):
         self.words = word_list
@@ -29,6 +12,7 @@ class ReaderState:
         self.current_index = 0          # 0‑based
         self.wpm = initial_wpm
         self.paused = False
+        self.mode = self.MODE_AUTO   # auto or manual
 
     @property
     def current_word(self) -> str:
@@ -56,3 +40,9 @@ class ReaderState:
 
     def is_finished(self) -> bool:
         return self.current_index >= self.total_words
+
+    def toggle_mode(self):
+        self.mode = self.MODE_MANUAL if self.mode == self.MODE_AUTO else self.MODE_AUTO
+        # when switching to manual mode, ensure we are not paused
+        if self.mode == self.MODE_MANUAL:
+            self.paused = False   # manual mode overrides auto timer
