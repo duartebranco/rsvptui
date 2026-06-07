@@ -18,6 +18,8 @@ class RSVPEngine:
         self.running = True
 
     def run(self):
+        # raw mode so Ctrl+C arrives as key code 3 instead of SIGINT
+        curses.raw()
         # make getch() non‑blocking
         self.stdscr.nodelay(True)
 
@@ -71,7 +73,7 @@ class RSVPEngine:
             return
 
         # global keys
-        if key == ord('q'):
+        if key == ord('q') or key == 3:  # Ctrl+C and q
             self.running = False
         elif key == ord('?'):
             # temporarily disable nodelay to show help
