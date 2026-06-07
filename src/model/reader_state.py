@@ -6,13 +6,13 @@ class ReaderState:
     MODE_AUTO = "auto"
     MODE_MANUAL = "manual"
 
-    def __init__(self, word_list: list[str], initial_wpm: int = 250):
+    def __init__(self, word_list: list[str], initial_wpm: int = 250, initial_index: int = 0, initial_mode: str = "auto"):
         self.words = word_list
         self.total_words = len(word_list)
-        self.current_index = 0          # 0‑based
+        self.current_index = initial_index
         self.wpm = initial_wpm
         self.paused = False
-        self.mode = self.MODE_AUTO   # auto or manual
+        self.mode = initial_mode
 
     @property
     def current_word(self) -> str:
