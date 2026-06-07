@@ -1,7 +1,0 @@
-To get started, just copy and paste text that you would like to read in this text box. AccelaReader will help you read faster by flashing words at you using what is called a Rapid Serial Visual Presentation.
-
-In the settings menu, you can determine how fast you would like to read (words per minute). You can also choose how many words you would like to be flashed at a time (chunk size), text size, and much more.
-
-Once you have saved your settings, press the 'Read' button on the application's toolbar to start reading.
-
-You can also add AccelaReader to your browser by clicking on the Bookmarklet tab on the top menu.

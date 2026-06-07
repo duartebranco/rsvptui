@@ -41,9 +41,15 @@ class RSVPEngine:
                 # if not paused and not finished, sleep for the required duration
                 if not self.state.paused and not self.state.is_finished():
                     delay = 60.0 / self.state.wpm
+
+                    # sleep more if punctuation
+                    if self.state.current_word.endswith(('.', '?', '!', ':', ';')):
+                        delay *= 1.5
+
                     # instead of sleeping the whole delay, we sleep in small chunks
                     # to keep the interface responsive to key presses.
                     self._responsive_sleep(delay)
+
                     # advance to next word
                     self.state.next_word()
                 else:

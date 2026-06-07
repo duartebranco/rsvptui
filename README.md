@@ -18,5 +18,5 @@ Minimal Rapid Serial Visual Presentation (RSVP) reader for plain text files.
 ## Usage
 
 ```bash
-python main.py sample.txt
+python main.py lusiads.txt
 ```
