@@ -33,7 +33,8 @@ class RSVPEngine:
                 progress=self.state.progress,
                 wpm=self.state.wpm,
                 paused=self.state.paused,
-                mode=self.state.mode
+                mode=self.state.mode,
+                eta=self._compute_eta()
             )
 
             # process input (non‑blocking)
@@ -117,6 +118,18 @@ class RSVPEngine:
         self.stdscr.clear()
         self.stdscr.refresh()
         self.stdscr.nodelay(True)
+
+    def _compute_eta(self) -> str:
+        remaining = max(0, len(self.state.words) - self.state.current_index)
+        minutes = remaining / self.state.wpm
+        if minutes >= 60:
+            h = int(minutes) // 60
+            m = int(minutes) % 60
+            return f"ETA: {h}h{m:02d}m"
+        elif minutes >= 1:
+            return f"ETA: {int(minutes)} min"
+        else:
+            return "ETA: <1 min"
 
     def _responsive_sleep(self, seconds: float):
         # sleep in short intervals so that pressing a key is detected quickly

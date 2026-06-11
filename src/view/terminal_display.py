@@ -64,7 +64,7 @@ class TerminalDisplay:
             except curses.error:
                 pass
 
-    def display_word(self, word: str, progress: float, wpm: int, paused: bool, mode: str):
+    def display_word(self, word: str, progress: float, wpm: int, paused: bool, mode: str, eta: str = ""):
         # clear screen and draw word, progress bar, status line
         self.clear()
 
@@ -84,10 +84,11 @@ class TerminalDisplay:
         except curses.error:
             pass
 
-        # status line: mode, WPM, pause, hints
+        # status line: mode, WPM, ETA, pause, hints
         if mode == "auto":
             play_state = "[PAUSED]" if paused else "[PLAYING]"
-            status = f" [AUTO]  WPM: {wpm}  {play_state}  |  j/k : speed"
+            eta_part = f"  {eta}" if eta else ""
+            status = f" [AUTO]  WPM: {wpm}{eta_part}  {play_state}  |  j/k : speed"
         else:
             status = " [MANUAL]  |  j : next word   k : prev word"
         if len(status) > self.width:
