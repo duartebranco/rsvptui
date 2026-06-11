@@ -112,6 +112,67 @@ class TerminalDisplay:
 
         self.refresh()
 
+    @staticmethod
+    def _wrap_text(text: str, width: int) -> list[str]:
+        words = text.split()
+        if not words:
+            return [""]
+        lines: list[str] = []
+        cur = words[0]
+        for w in words[1:]:
+            if len(cur) + 1 + len(w) <= width:
+                cur += " " + w
+            else:
+                lines.append(cur)
+                cur = w
+        lines.append(cur)
+        return lines
+
+    def display_overview(self, text: str, title: str = ""):
+        self.clear()
+        # content area - leave bottom 3 lines for status
+        content_height = self.height - 3
+        line_y = 1
+        if title:
+            display = f">>> {title} <<<"
+            x = max(0, (self.width - len(display)) // 2)
+            try:
+                self.stdscr.addstr(line_y, x, display, curses.A_BOLD)
+            except curses.error:
+                pass
+            line_y += 2
+        wrapped = self._wrap_text(text, self.width - 4)
+        max_lines = content_height - line_y - 1
+        if len(wrapped) > max_lines:
+            wrapped = wrapped[:max_lines - 1] + ["..."]
+        start_y = max(line_y, (content_height - len(wrapped)) // 2)
+        for i, line in enumerate(wrapped):
+            x = max(0, (self.width - len(line)) // 2)
+            try:
+                self.stdscr.addstr(start_y + i, x, line)
+            except curses.error:
+                pass
+
+        # status line (manual mode)
+        status = " [MANUAL]  |  j : next word   k : prev word"
+        if len(status) > self.width:
+            status = status[:self.width - 1]
+        try:
+            self.stdscr.addstr(self.height - 3, 0, status)
+        except curses.error:
+            pass
+
+        # bottom hint line
+        hint = " m: toggle mode  ?: help  q: quit"
+        if len(hint) > self.width:
+            hint = hint[:self.width - 1]
+        try:
+            self.stdscr.addstr(self.height - 2, 0, hint)
+        except curses.error:
+            pass
+
+        self.refresh()
+
     def show_completion(self):
         # display end-of-book message
         self.clear()

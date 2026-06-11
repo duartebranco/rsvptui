@@ -36,6 +36,8 @@ def main():
             initial_wpm=initial_wpm,
             initial_index=initial_index,
             initial_mode=initial_mode,
+            paragraph_ranges=book.paragraph_ranges,
+            chapter_starts=book.chapter_starts,
         )
         display = TerminalDisplay(stdscr)
         help_view = HelpView(stdscr)

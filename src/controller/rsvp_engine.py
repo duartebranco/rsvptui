@@ -85,6 +85,36 @@ class RSVPEngine:
             if self.state.mode == ReaderState.MODE_AUTO:
                 self.state.paused = not self.state.paused
 
+        # paragraph navigation
+        if key == 10:  # Ctrl+j - next paragraph
+            para = self.state.find_paragraph()
+            if para < len(self.state.paragraph_ranges) - 1:
+                self._show_paragraph_overview(para + 1)
+            return
+        elif key == 11:  # Ctrl+k - previous paragraph
+            para = self.state.find_paragraph()
+            if para > 0:
+                self._show_paragraph_overview(para - 1)
+            return
+
+        # chapter navigation
+        if key == ord(']'):
+            if self.state.chapter_starts:
+                ch = self.state.find_chapter()
+                if ch < len(self.state.chapter_starts) - 1:
+                    self._show_chapter_overview(ch + 1)
+                else:
+                    self._show_chapter_overview(ch)
+            return
+        elif key == ord('['):
+            if self.state.chapter_starts:
+                ch = self.state.find_chapter()
+                if ch > 0:
+                    self._show_chapter_overview(ch - 1)
+                else:
+                    self._show_chapter_overview(ch)
+            return
+
         # mode‑specific keys
         if self.state.mode == ReaderState.MODE_AUTO:
             if key == ord('+') or key == ord('k'):
@@ -101,6 +131,94 @@ class RSVPEngine:
                 self.state.wpm = min(self.state.wpm + self.WPM_STEP, self.MAX_WPM)
             elif key == ord('-'):
                 self.state.wpm = max(self.state.wpm - self.WPM_STEP, self.MIN_WPM)
+
+    def _show_paragraph_overview(self, para: int):
+        if para < 0 or para >= len(self.state.paragraph_ranges):
+            return
+        self.state.mode = ReaderState.MODE_MANUAL
+        self.state.paused = False
+        self.stdscr.nodelay(False)
+
+        while True:
+            text = self.state.get_paragraph_text(para)
+            self.display.display_overview(text)
+
+            key = self.stdscr.getch()
+
+            if key == ord('j'):
+                self.state.current_index = self.state.paragraph_ranges[para][0]
+                break
+            elif key == ord('k'):
+                if para > 0:
+                    self.state.current_index = self.state.paragraph_ranges[para - 1][1] - 1
+                break
+            elif key == 10:  # Ctrl+j - next paragraph in overview
+                if para < len(self.state.paragraph_ranges) - 1:
+                    para += 1
+            elif key == 11:  # Ctrl+k - previous paragraph in overview
+                if para > 0:
+                    para -= 1
+            elif key == ord(']'):
+                if self.state.chapter_starts:
+                    ch = self.state.find_chapter(self.state.paragraph_ranges[para][0])
+                    if ch < len(self.state.chapter_starts) - 1:
+                        self._show_chapter_overview(ch + 1)
+                    else:
+                        self._show_chapter_overview(ch)
+                break
+            elif key == ord('['):
+                if self.state.chapter_starts:
+                    ch = self.state.find_chapter(self.state.paragraph_ranges[para][0])
+                    if ch > 0:
+                        self._show_chapter_overview(ch - 1)
+                    else:
+                        self._show_chapter_overview(ch)
+                break
+            elif key == ord('q') or key == 27:
+                break
+
+        self.stdscr.nodelay(True)
+
+    def _show_chapter_overview(self, ch: int):
+        if ch < 0 or ch >= len(self.state.chapter_starts):
+            return
+        self.state.mode = ReaderState.MODE_MANUAL
+        self.state.paused = False
+        self.stdscr.nodelay(False)
+
+        while True:
+            title = self.state.get_chapter_title(ch)
+            first_para = self.state.find_first_para_of_chapter(ch)
+            # skip the heading paragraph itself
+            if (first_para < len(self.state.paragraph_ranges)
+                    and self.state.paragraph_ranges[first_para][0] == self.state.chapter_starts[ch][0]):
+                first_para += 1
+            text = self.state.get_paragraph_text(first_para)
+            self.display.display_overview(text, title=title)
+
+            key = self.stdscr.getch()
+
+            if key == ord('j'):
+                self.state.current_index = self.state.paragraph_ranges[first_para][0]
+                break
+            elif key == ord('k'):
+                if ch > 0:
+                    ch_start = self.state.chapter_starts[ch][0]
+                    for pi in range(len(self.state.paragraph_ranges) - 1, -1, -1):
+                        if self.state.paragraph_ranges[pi][0] < ch_start:
+                            self.state.current_index = self.state.paragraph_ranges[pi][1] - 1
+                            break
+                break
+            elif key == ord(']'):
+                if ch < len(self.state.chapter_starts) - 1:
+                    ch += 1
+            elif key == ord('['):
+                if ch > 0:
+                    ch -= 1
+            elif key == ord('q') or key == 27:
+                break
+
+        self.stdscr.nodelay(True)
 
     def _show_help(self):
         self.stdscr.nodelay(False)
