@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from src.model.book import Book
 from src.model.reader_state import ReaderState
 from src.view.terminal_display import TerminalDisplay
+from src.view.help_view import HelpView
 from src.controller.rsvp_engine import RSVPEngine
 from src.utils.bookmarks import BookmarkManager
 
@@ -37,7 +38,8 @@ def main():
             initial_mode=initial_mode,
         )
         display = TerminalDisplay(stdscr)
-        engine = RSVPEngine(state, display, stdscr)
+        help_view = HelpView(stdscr)
+        engine = RSVPEngine(state, display, help_view, stdscr)
         engine.run()
 
         BookmarkManager.save_or_remove(

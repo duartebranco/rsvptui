@@ -3,7 +3,6 @@ import curses
 import time
 from model.reader_state import ReaderState
 from view.terminal_display import TerminalDisplay
-from view.help_view import HelpView
 
 class RSVPEngine:
     # orchestrates the reading session
@@ -11,9 +10,10 @@ class RSVPEngine:
     MAX_WPM = 800
     WPM_STEP = 10
 
-    def __init__(self, state: ReaderState, display: TerminalDisplay, stdscr):
+    def __init__(self, state: ReaderState, display: TerminalDisplay, help_view, stdscr):
         self.state = state
         self.display = display
+        self.help_view = help_view
         self.stdscr = stdscr
         self.running = True
 
@@ -76,12 +76,7 @@ class RSVPEngine:
         if key == ord('q') or key == 3:  # Ctrl+C and q
             self.running = False
         elif key == ord('?'):
-            # temporarily disable nodelay to show help
-            self.stdscr.nodelay(False)
-            help_view = HelpView(self.stdscr)
-            help_view.show()
-            self.stdscr.nodelay(True)
-            # after help, re‑draw current word
+            self._show_help()
             return
         elif key == ord('m'):
             self.state.toggle_mode()
@@ -105,6 +100,23 @@ class RSVPEngine:
                 self.state.wpm = min(self.state.wpm + self.WPM_STEP, self.MAX_WPM)
             elif key == ord('-'):
                 self.state.wpm = max(self.state.wpm - self.WPM_STEP, self.MIN_WPM)
+
+    def _show_help(self):
+        self.stdscr.nodelay(False)
+        scroll = 0
+        while True:
+            self.help_view.render(scroll)
+            key = self.stdscr.getch()
+            if key == ord('q') or key == 27:
+                break
+            elif key == ord('j') or key == curses.KEY_DOWN:
+                max_y, _ = self.stdscr.getmaxyx()
+                scroll = min(scroll + 1, max(0, len(self.help_view.lines) - (max_y - 2)))
+            elif key == ord('k') or key == curses.KEY_UP:
+                scroll = max(scroll - 1, 0)
+        self.stdscr.clear()
+        self.stdscr.refresh()
+        self.stdscr.nodelay(True)
 
     def _responsive_sleep(self, seconds: float):
         # sleep in short intervals so that pressing a key is detected quickly
