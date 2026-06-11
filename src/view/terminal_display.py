@@ -84,13 +84,12 @@ class TerminalDisplay:
         except curses.error:
             pass
 
-        # status line: WPM, pause indicator, help, mode
-        mode_indicator = "MANUAL" if mode == "manual" else "AUTO"
+        # status line: mode, WPM, pause, hints
         if mode == "auto":
-            speed_hint = "j/k : speed"
+            play_state = "[PAUSED]" if paused else "[PLAYING]"
+            status = f" [AUTO]  WPM: {wpm}  {play_state}  |  j/k : speed"
         else:
-            speed_hint = "j : next word   k : prev word"
-        status = f" [{mode_indicator}]  WPM: {wpm}  {'[PAUSED]' if paused else '[PLAYING]'}  |  {speed_hint}"
+            status = " [MANUAL]  |  j : next word   k : prev word"
         if len(status) > self.width:
             status = status[:self.width - 1]
         try:
@@ -99,7 +98,10 @@ class TerminalDisplay:
             pass
 
         # bottom hint line
-        hint = " Space/p: pause  m: toggle mode  ?: help  q: quit"
+        if mode == "auto":
+            hint = " Space/p: pause  m: toggle mode  ?: help  q: quit"
+        else:
+            hint = " m: toggle mode  ?: help  q: quit"
         if len(hint) > self.width:
             hint = hint[:self.width - 1]
         try:
