@@ -141,7 +141,7 @@ class RSVPEngine:
 
         while True:
             text = self.state.get_paragraph_text(para)
-            self.display.display_overview(text)
+            self.display.display_overview(text, self.state.progress, self.state.wpm, eta=self._compute_eta())
 
             key = self.stdscr.getch()
 
@@ -194,7 +194,7 @@ class RSVPEngine:
                     and self.state.paragraph_ranges[first_para][0] == self.state.chapter_starts[ch][0]):
                 first_para += 1
             text = self.state.get_paragraph_text(first_para)
-            self.display.display_overview(text, title=title)
+            self.display.display_overview(text, self.state.progress, self.state.wpm, title=title, eta=self._compute_eta())
 
             key = self.stdscr.getch()
 

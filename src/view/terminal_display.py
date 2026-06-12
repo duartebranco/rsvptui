@@ -64,27 +64,20 @@ class TerminalDisplay:
             except curses.error:
                 pass
 
-    def display_word(self, word: str, progress: float, wpm: int, paused: bool, mode: str, eta: str = ""):
-        # clear screen and draw word, progress bar, status line
-        self.clear()
-
-        # centered word
-        word_x = max(0, (self.width - len(word)) // 2)
-        word_y = self.height // 2
-        self._display_colored_word(word_y, word_x, word)
-
-        # progress bar
+    # progress bar
+    def _draw_progress_bar(self, progress: float):
         bar_width = min(40, self.width - 4)
         filled = int(progress * bar_width)
         bar = "[" + "#" * filled + "-" * (bar_width - filled) + "]"
         percent = int(progress * 100)
-        progress_text = f" {percent}% {bar}"
+        text = f" {percent}% {bar}"
         try:
-            self.stdscr.addstr(self.height - 4, 0, progress_text[:self.width - 1])
+            self.stdscr.addstr(self.height - 4, 0, text[:self.width - 1])
         except curses.error:
             pass
 
-        # status line: mode, WPM, ETA, pause, hints
+    # status line: mode, WPM, ETA, pause, hints
+    def _draw_status_line(self, mode: str, wpm: int = 0, paused: bool = False, eta: str = ""):
         if mode == "auto":
             play_state = "[PAUSED]" if paused else "[PLAYING]"
             eta_part = f"  {eta}" if eta else ""
@@ -98,7 +91,8 @@ class TerminalDisplay:
         except curses.error:
             pass
 
-        # bottom hint line
+    # bottom hint line
+    def _draw_hint_line(self, mode: str):
         if mode == "auto":
             hint = " Ctrl+j/k:paragraph  [/]:chapter  Space:pause  m:mode  ?:help  q:quit"
         else:
@@ -110,6 +104,18 @@ class TerminalDisplay:
         except curses.error:
             pass
 
+    def display_word(self, word: str, progress: float, wpm: int, paused: bool, mode: str, eta: str = ""):
+        # clear screen and draw word, progress bar, status line
+        self.clear()
+
+        # centered word
+        word_x = max(0, (self.width - len(word)) // 2)
+        word_y = self.height // 2
+        self._display_colored_word(word_y, word_x, word)
+
+        self._draw_progress_bar(progress)
+        self._draw_status_line(mode, wpm, paused, eta)
+        self._draw_hint_line(mode)
         self.refresh()
 
     @staticmethod
@@ -128,10 +134,9 @@ class TerminalDisplay:
         lines.append(cur)
         return lines
 
-    def display_overview(self, text: str, title: str = ""):
+    def display_overview(self, text: str, progress: float, wpm: int, title: str = "", eta: str = ""):
         self.clear()
-        # content area - leave bottom 3 lines for status
-        content_height = self.height - 3
+        content_height = self.height - 4
         line_y = 1
         if title:
             display = f">>> {title} <<<"
@@ -153,24 +158,9 @@ class TerminalDisplay:
             except curses.error:
                 pass
 
-        # status line (manual mode)
-        status = " [MANUAL]  |  j/k : word   Ctrl+j/k : paragraph   [/] : chapter"
-        if len(status) > self.width:
-            status = status[:self.width - 1]
-        try:
-            self.stdscr.addstr(self.height - 3, 0, status)
-        except curses.error:
-            pass
-
-        # bottom hint line
-        hint = " Ctrl+j/k:paragraph  [/]:chapter  m:mode  ?:help  q:quit"
-        if len(hint) > self.width:
-            hint = hint[:self.width - 1]
-        try:
-            self.stdscr.addstr(self.height - 2, 0, hint)
-        except curses.error:
-            pass
-
+        self._draw_progress_bar(progress)
+        self._draw_status_line("manual", wpm, eta=eta)
+        self._draw_hint_line("manual")
         self.refresh()
 
     def show_completion(self):
