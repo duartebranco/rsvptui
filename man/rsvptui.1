@@ -1,12 +1,12 @@
 .\" Man page for rsvp-tui
-.TH RSVP-TUI 1 "2025-03-06" "1.0" "User Commands"
+.TH RSVP-TUI 1 "2026-06-12" "1.0" "User Commands"
 .SH NAME
 rsvp-tui \- Rapid Serial Visual Presentation terminal ebook reader
 .SH SYNOPSIS
 .B rsvp-tui
 [\fIfile\fR]
 .SH DESCRIPTION
-\fBrsvp-tui\fR displays a text file one word at a time in the centre of the terminal, using the RSVP technique to speed reading. It features a modal interface with Vim‑style key bindings and Optimal Recognition Point (ORP) colour highlighting.
+\fBrsvp-tui\fR displays a text file one word at a time in the centre of the terminal, using the RSVP technique to speed reading. It features a modal interface with Vim‑style key bindings, chapter and paragraph navigation, and Optimal Recognition Point (ORP) colour highlighting.
 .SH OPTIONS
 \fIfile\fR
 .RS
@@ -18,7 +18,7 @@ Path to a plain text file to read.
 Words advance automatically at the specified words‑per‑minute (WPM) rate.
 .TP
 \fBManual mode\fR
-Words advance only when you press \fBj\fR or \fBl\fR.
+Words advance only when you press \fBj\fR or \fBk\fR.
 .SH KEY BINDINGS
 .SS Global
 .TP
@@ -30,26 +30,47 @@ Show help panel.
 .TP
 \fBm\fR
 Toggle between Auto and Manual mode.
+.TP
+\fBCtrl+j\fR
+Jump to next paragraph (shows overview).
+.TP
+\fBCtrl+k\fR
+Jump to previous paragraph (shows overview).
+.TP
+\fB]\fR
+Jump to next chapter (shows overview).
+.TP
+\fB[\fR
+Jump to previous chapter (shows overview).
 .SS Auto mode
 .TP
 \fB+\fR or \fBk\fR
 Increase WPM by 10.
 .TP
-\fB-\fR or \fBj\fR
+\fB\-\fR or \fBj\fR
 Decrease WPM by 10.
 .TP
 \fBSpace\fR or \fBp\fR
 Pause / resume.
 .SS Manual mode
 .TP
-\fBj\fR or \fBl\fR
+\fBj\fR
 Next word.
 .TP
-\fBh\fR or \fBk\fR
+\fBk\fR
 Previous word.
+.TP
+\fB+\fR
+Increase WPM by 10.
+.TP
+\fB\-\fR
+Decrease WPM by 10.
 .SH FEATURES
 - Centred word display with ORP letter highlighted in yellow (if terminal supports colour).
-- Real‑time progress bar and WPM display.
+- Real‑time progress bar, WPM and ETA display.
+- Chapter and paragraph navigation with content overview.
+- Punctuation pause (1.5× delay after sentences).
+- Resume prompt on startup (via bookmark file).
 - Non‑blocking input for responsive controls.
 .SH BUGS
 Report issues at https://github.com/yourname/rsvp-tui

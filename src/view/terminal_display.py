@@ -90,7 +90,7 @@ class TerminalDisplay:
             eta_part = f"  {eta}" if eta else ""
             status = f" [AUTO]  WPM: {wpm}{eta_part}  {play_state}  |  j/k : speed"
         else:
-            status = " [MANUAL]  |  j : next word   k : prev word"
+            status = " [MANUAL]  |  j/k : word   Ctrl+j/k : paragraph   [/] : chapter"
         if len(status) > self.width:
             status = status[:self.width - 1]
         try:
@@ -100,9 +100,9 @@ class TerminalDisplay:
 
         # bottom hint line
         if mode == "auto":
-            hint = " Space/p: pause  m: toggle mode  ?: help  q: quit"
+            hint = " Ctrl+j/k:paragraph  [/]:chapter  Space:pause  m:mode  ?:help  q:quit"
         else:
-            hint = " m: toggle mode  ?: help  q: quit"
+            hint = " Ctrl+j/k:paragraph  [/]:chapter  m:mode  ?:help  q:quit"
         if len(hint) > self.width:
             hint = hint[:self.width - 1]
         try:
@@ -154,7 +154,7 @@ class TerminalDisplay:
                 pass
 
         # status line (manual mode)
-        status = " [MANUAL]  |  j : next word   k : prev word"
+        status = " [MANUAL]  |  j/k : word   Ctrl+j/k : paragraph   [/] : chapter"
         if len(status) > self.width:
             status = status[:self.width - 1]
         try:
@@ -163,7 +163,7 @@ class TerminalDisplay:
             pass
 
         # bottom hint line
-        hint = " m: toggle mode  ?: help  q: quit"
+        hint = " Ctrl+j/k:paragraph  [/]:chapter  m:mode  ?:help  q:quit"
         if len(hint) > self.width:
             hint = hint[:self.width - 1]
         try:
