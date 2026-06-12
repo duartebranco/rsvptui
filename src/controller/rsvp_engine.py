@@ -141,7 +141,9 @@ class RSVPEngine:
 
         while True:
             text = self.state.get_paragraph_text(para)
-            self.display.display_overview(text, self.state.progress, self.state.wpm, eta=self._compute_eta())
+            nav_index = self.state.paragraph_ranges[para][0]
+            nav_progress = nav_index / self.state.total_words
+            self.display.display_overview(text, nav_progress, self.state.wpm, eta=self._compute_eta(nav_index))
 
             key = self.stdscr.getch()
 
@@ -194,7 +196,9 @@ class RSVPEngine:
                     and self.state.paragraph_ranges[first_para][0] == self.state.chapter_starts[ch][0]):
                 first_para += 1
             text = self.state.get_paragraph_text(first_para)
-            self.display.display_overview(text, self.state.progress, self.state.wpm, title=title, eta=self._compute_eta())
+            nav_index = self.state.chapter_starts[ch][0]
+            nav_progress = nav_index / self.state.total_words
+            self.display.display_overview(text, nav_progress, self.state.wpm, title=title, eta=self._compute_eta(nav_index))
 
             key = self.stdscr.getch()
 
@@ -237,8 +241,9 @@ class RSVPEngine:
         self.stdscr.refresh()
         self.stdscr.nodelay(True)
 
-    def _compute_eta(self) -> str:
-        remaining = max(0, len(self.state.words) - self.state.current_index)
+    def _compute_eta(self, index: int | None = None) -> str:
+        idx = self.state.current_index if index is None else index
+        remaining = max(0, len(self.state.words) - idx)
         minutes = remaining / self.state.wpm
         if minutes >= 60:
             h = int(minutes) // 60
