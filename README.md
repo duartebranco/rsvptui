@@ -2,6 +2,10 @@
 
 Minimal Rapid Serial Visual Presentation (RSVP) reader for plain text files.
 
+## Demo
+
+![Demo GIF](samples/demo.gif)
+
 ## Features
 
 - Flash words one by one in the centre of the terminal.
