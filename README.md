@@ -49,3 +49,9 @@ On startup, if a previous session was saved for the same file, you'll be prompte
 - **Progress bar** - real-time position, WPM, and ETA
 - **Bookmarks** - progress is saved automatically on quit, resume prompt on start
 - **Chapter & paragraph navigation** - markdown headings and blank-line separated paragraphs are detected
+
+## TODO
+
+- linux packaging
+- other platforms/devices
+- other programming languages
