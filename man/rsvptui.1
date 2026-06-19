@@ -1,32 +1,36 @@
-.\" Man page for rsvp-tui
-.TH RSVP-TUI 1 "2026-06-12" "1.0" "User Commands"
+.\" Man page for rsvptui
+.TH RSVPTUI 1 "2026-06-19" "1.0" "User Commands"
 .SH NAME
-rsvp-tui \- Rapid Serial Visual Presentation terminal ebook reader
+rsvptui \- Rapid Serial Visual Presentation terminal ebook reader
 .SH SYNOPSIS
-.B rsvp-tui
-[\fIfile\fR]
+.B rsvptui
+.I file
 .SH DESCRIPTION
-\fBrsvp-tui\fR displays a text file one word at a time in the centre of the terminal, using the RSVP technique to speed reading. It features a modal interface with Vim‑style key bindings, chapter and paragraph navigation, and Optimal Recognition Point (ORP) colour highlighting.
+.B rsvptui
+displays a plain text file one word at a time in the centre of the terminal,
+using the RSVP technique to speed reading.  It features a modal interface with
+Vim-style keys, chapter and paragraph navigation, Optimal Recognition Point
+(ORP) colour highlighting, and automatic punctuation pauses.
 .SH OPTIONS
-\fIfile\fR
-.RS
-Path to a plain text file to read.
-.RE
+.TP
+.I file
+Path to a plain text file (.txt, .md, or any UTF-8 text).
 .SH MODES
-.TP
-\fBAuto mode\fR (default)
-Words advance automatically at the specified words‑per‑minute (WPM) rate.
-.TP
-\fBManual mode\fR
-Words advance only when you press \fBj\fR or \fBk\fR.
+.B Auto mode
+(default) \- words advance automatically at the configured words-per-minute
+(WPM) rate.  The rate can be changed at any time with \fB+\fR/\fB\-\fR.
+.P
+.B Manual mode
+\- words advance only when you press \fBj\fR (next) or \fBk\fR (previous).
+Useful for密集 text or reference material.
 .SH KEY BINDINGS
-.SS Global
+.SS Global (any mode)
 .TP
 \fBq\fR
-Quit the program.
+Quit the program (also Ctrl+C).
 .TP
 \fB?\fR
-Show help panel.
+Show scrollable help panel.
 .TP
 \fBm\fR
 Toggle between Auto and Manual mode.
@@ -45,13 +49,13 @@ Jump to previous chapter (shows overview).
 .SS Auto mode
 .TP
 \fB+\fR or \fBk\fR
-Increase WPM by 10.
+Increase WPM by 10 (range 60-800).
 .TP
 \fB\-\fR or \fBj\fR
 Decrease WPM by 10.
 .TP
 \fBSpace\fR or \fBp\fR
-Pause / resume.
+Pause / resume playback.
 .SS Manual mode
 .TP
 \fBj\fR
@@ -65,14 +69,69 @@ Increase WPM by 10.
 .TP
 \fB\-\fR
 Decrease WPM by 10.
+.SS Overview navigation (paragraph / chapter)
+When viewing a paragraph or chapter overview:
+.TP
+\fBj\fR
+Start reading from the first word of the selected item.
+.TP
+\fBk\fR
+Start reading from the last word of the previous item.
+.TP
+\fBCtrl+j\fR / \fBCtrl+k\fR
+Cycle to next / previous paragraph (paragraph overview only).
+.TP
+\fB]\fR / \fB[\fR
+Cycle to next / previous chapter (chapter overview only).
+.TP
+\fBq\fR or \fBESC\fR
+Exit overview without changing position.
+.SS Help panel
+.TP
+\fBj\fR or \fBDown\fR
+Scroll down.
+.TP
+\fBk\fR or \fBUp\fR
+Scroll up.
+.TP
+\fBq\fR or \fBESC\fR
+Close help.
 .SH FEATURES
-- Centred word display with ORP letter highlighted in yellow (if terminal supports colour).
-- Real‑time progress bar, WPM and ETA display.
-- Chapter and paragraph navigation with content overview.
-- Punctuation pause (1.5× delay after sentences).
-- Resume prompt on startup (via bookmark file).
-- Non‑blocking input for responsive controls.
+.TP
+Optimal Recognition Point (ORP)
+The middle letter of each word is highlighted in yellow (if the terminal
+supports colour) to improve word recognition.
+.TP
+Punctuation pause
+Words ending in \fB.\fR \fB?\fR \fB!\fR \fB:\fR \fB;\fR get a 1.5x extra
+delay in auto mode, mimicking natural sentence rhythm.
+.TP
+Progress display
+Real-time progress bar with percentage, current WPM, and estimated time
+remaining (ETA).
+.TP
+Chapter navigation
+Markdown headings (\fB# ...\fR) are detected as chapter boundaries.
+An overview shows the chapter title and its first paragraph content.
+.TP
+Paragraph navigation
+Blank-line separated paragraphs are indexed for quick jumping.
+.TP
+Bookmarks
+Progress (position, WPM, mode) is saved to
+\fB~/.config/rsvp-tui/bookmarks.json\fR on exit.  On startup, if a bookmark
+exists for the same file, you are prompted to resume.  Finished books are
+automatically removed.
+.SH ENVIRONMENT
+.TP
+.B TERM
+The terminal must support \fBcurses\fR.  A real TTY is required; piping
+output will interfere with the resume prompt and terminal rendering.
+.SH FILES
+.TP
+.B ~/.config/rsvp-tui/bookmarks.json
+Bookmark data (JSON).  Created automatically on first save.
 .SH BUGS
-Report issues at https://github.com/yourname/rsvp-tui
+Report issues at https://github.com/duartebranco/rsvptui
 .SH AUTHOR
-Written by yourname <email@example.com>
+Written by Duarte Branco.
