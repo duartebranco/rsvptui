@@ -51,14 +51,12 @@ class BookmarkManager:
         bookmark = BookmarkManager.get(filepath)
         if bookmark is None:
             return (0, 250, "auto")
+        wpm = bookmark.get("wpm", 250)
+        mode = bookmark.get("mode", "auto")
         answer = input(f"Resume at word {bookmark['index'] + 1}/{total_words}? (y/n) ")
         if answer.lower() != 'y':
-            return (0, 250, "auto")
-        return (
-            bookmark["index"],
-            bookmark.get("wpm", 250),
-            bookmark.get("mode", "auto"),
-        )
+            return (0, wpm, mode)
+        return (bookmark["index"], wpm, mode)
 
     @staticmethod
     def save_or_remove(filepath: str, index: int, wpm: int, mode: str, finished: bool):
